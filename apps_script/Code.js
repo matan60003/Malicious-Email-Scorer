@@ -1,5 +1,5 @@
 // NOTE: Change this URL to your ngrok or production backend URL during deployment.
-const BACKEND_URL = "http://localhost:8000/api/v1/scan";
+const BACKEND_URL = "https://slaw-jolliness-neurotic.ngrok-free.dev/api/v1/scan";
 
 function onHomepage(e) {
   return CardService.newCardBuilder()
@@ -140,14 +140,13 @@ function renderResultCard(result) {
   }
   
   if (result.reasons && result.reasons.length > 0) {
-    var reasonsHtml = "<ul>";
+    var reasonsHtml = "<b>Reasoning:</b><br>";
     for (var i = 0; i < result.reasons.length; i++) {
-      reasonsHtml += "<li>" + result.reasons[i] + "</li>";
+      reasonsHtml += "• " + result.reasons[i] + "<br>";
     }
-    reasonsHtml += "</ul>";
     
     section.addWidget(
-      CardService.newTextParagraph().setText("<b>Reasoning:</b><br>" + reasonsHtml)
+      CardService.newTextParagraph().setText(reasonsHtml)
     );
   }
   
