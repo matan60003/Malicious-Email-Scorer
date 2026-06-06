@@ -6,6 +6,7 @@ from typing import List
 
 router = APIRouter()
 
+
 @router.get("/", response_model=List[ScanHistory])
 def get_scan_history(session: Session = Depends(get_session), limit: int = 50):
     statement = select(ScanHistory).order_by(ScanHistory.scanned_at.desc()).limit(limit)

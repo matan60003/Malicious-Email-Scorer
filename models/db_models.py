@@ -2,11 +2,15 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime
 
+
 class Blocklist(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    value: str = Field(index=True, unique=True, description="The email or domain to block")
+    value: str = Field(
+        index=True, unique=True, description="The email or domain to block"
+    )
     type: str = Field(description="'email' or 'domain'")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
 
 class ScanHistory(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

@@ -18,9 +18,11 @@ app = FastAPI(
 # Exception handlers
 app.add_exception_handler(Exception, global_exception_handler)
 
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+
 
 # Include API router
 app.include_router(api_router)

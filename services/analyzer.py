@@ -7,22 +7,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-async def analyze_email(request: EmailScanRequest, session: Session = None) -> EmailScanResponse:
+async def analyze_email(
+    request: EmailScanRequest, session: Session = None
+) -> EmailScanResponse:
     score = 0
     reasons = []
 
     # 0. Check Blocklist First
     if session:
         statement = select(Blocklist).where(
-            (Blocklist.value == request.sender.email) | 
-            (Blocklist.value == request.sender.domain)
+            (Blocklist.value == request.sender.email)
+            | (Blocklist.value == request.sender.domain)
         )
         blocked = session.exec(statement).first()
         if blocked:
             final_score = 100
             verdict = "MALICIOUS"
             reasons = ["Sender is on your personal blocklist."]
-            
+
             # Record history
             history = ScanHistory(
                 message_id=request.id,
@@ -30,11 +32,11 @@ async def analyze_email(request: EmailScanRequest, session: Session = None) -> E
                 sender_domain=request.sender.domain,
                 subject=request.subject,
                 score=final_score,
-                verdict=verdict
+                verdict=verdict,
             )
             session.add(history)
             session.commit()
-            
+
             return EmailScanResponse(
                 id=request.id, score=final_score, verdict=verdict, reasons=reasons
             )
@@ -124,7 +126,7 @@ async def analyze_email(request: EmailScanRequest, session: Session = None) -> E
             sender_domain=request.sender.domain,
             subject=request.subject,
             score=final_score,
-            verdict=verdict
+            verdict=verdict,
         )
         session.add(history)
         session.commit()

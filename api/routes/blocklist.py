@@ -6,18 +6,22 @@ from typing import List
 
 router = APIRouter()
 
+
 @router.post("/", response_model=Blocklist)
-def add_to_blocklist(blocklist_item: Blocklist, session: Session = Depends(get_session)):
+def add_to_blocklist(
+    blocklist_item: Blocklist, session: Session = Depends(get_session)
+):
     # Check if exists
     statement = select(Blocklist).where(Blocklist.value == blocklist_item.value)
     existing = session.exec(statement).first()
     if existing:
         raise HTTPException(status_code=400, detail="Item already in blocklist")
-    
+
     session.add(blocklist_item)
     session.commit()
     session.refresh(blocklist_item)
     return blocklist_item
+
 
 @router.get("/", response_model=List[Blocklist])
 def get_blocklist(session: Session = Depends(get_session)):

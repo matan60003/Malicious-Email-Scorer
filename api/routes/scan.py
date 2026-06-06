@@ -8,5 +8,7 @@ router = APIRouter()
 
 
 @router.post("/scan", response_model=EmailScanResponse)
-async def scan_email(request: EmailScanRequest, session: Session = Depends(get_session)):
+async def scan_email(
+    request: EmailScanRequest, session: Session = Depends(get_session)
+):
     return await analyze_email(request, session)

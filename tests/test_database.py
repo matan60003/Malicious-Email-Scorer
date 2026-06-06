@@ -9,16 +9,17 @@ from sqlalchemy.pool import StaticPool
 # Use in-memory SQLite for testing
 sqlite_url = "sqlite://"
 engine = create_engine(
-    sqlite_url, 
-    connect_args={"check_same_thread": False}, 
-    poolclass=StaticPool
+    sqlite_url, connect_args={"check_same_thread": False}, poolclass=StaticPool
 )
+
 
 def get_session_override():
     with Session(engine) as session:
         yield session
 
+
 app.dependency_overrides[get_session] = get_session_override
+
 
 @pytest.fixture(name="session", autouse=True)
 def session_fixture():
@@ -26,6 +27,7 @@ def session_fixture():
     with Session(engine) as session:
         yield session
     SQLModel.metadata.drop_all(engine)
+
 
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
@@ -37,11 +39,15 @@ def client_fixture(session: Session):
     yield client
     app.dependency_overrides.clear()
 
+
 def test_add_to_blocklist(client: TestClient):
-    response = client.post("/api/v1/blocklist/", json={"value": "test@evil.com", "type": "email"})
+    response = client.post(
+        "/api/v1/blocklist/", json={"value": "test@evil.com", "type": "email"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["value"] == "test@evil.com"
+
 
 def test_scan_with_blocklist(client: TestClient, session: Session):
     # Add to blocklist
@@ -56,7 +62,7 @@ def test_scan_with_blocklist(client: TestClient, session: Session):
         "subject": "Hello",
         "body_text": "This is a test.",
         "urls": [],
-        "headers": {"spf_status": "PASS", "dkim_status": "PASS"}
+        "headers": {"spf_status": "PASS", "dkim_status": "PASS"},
     }
 
     response = client.post("/api/v1/scan", json=payload)
