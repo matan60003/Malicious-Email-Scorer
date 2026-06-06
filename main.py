@@ -4,7 +4,7 @@ from core.config import settings
 from api.router import api_router
 from core.exceptions import global_exception_handler
 from core.database import create_db_and_tables
-import models.db_models  # Import to register models with SQLModel
+import models.db_models  # noqa: F401 (Import to register models with SQLModel)
 
 # Configure basic logging
 logging.basicConfig(

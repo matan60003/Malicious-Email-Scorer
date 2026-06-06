@@ -3,7 +3,7 @@ from sqlmodel import SQLModel, Session, create_engine
 from fastapi.testclient import TestClient
 from main import app
 from core.database import get_session
-from models.db_models import Blocklist, ScanHistory
+from models.db_models import Blocklist
 from sqlalchemy.pool import StaticPool
 
 # Use in-memory SQLite for testing
