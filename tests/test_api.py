@@ -4,6 +4,7 @@ from unittest.mock import patch, AsyncMock
 from sqlmodel import SQLModel, Session, create_engine
 from api.dependencies import get_session
 from sqlalchemy.pool import StaticPool
+from schemas.intel import IntelResult
 import pytest
 
 # Use in-memory SQLite for testing
@@ -35,9 +36,9 @@ def test_health_check(client: TestClient):
     assert response.json() == {"status": "ok"}
 
 
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 def test_scan_email_safe(mock_gather, client: TestClient):
-    mock_gather.return_value = {"virustotal": {}, "safebrowsing": {}}
+    mock_gather.return_value = IntelResult()
 
     payload = {
         "id": "email_123",
@@ -55,9 +56,9 @@ def test_scan_email_safe(mock_gather, client: TestClient):
     assert data["score"] == 0
 
 
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 def test_scan_email_suspicious(mock_gather, client: TestClient):
-    mock_gather.return_value = {"virustotal": {}, "safebrowsing": {}}
+    mock_gather.return_value = IntelResult()
 
     payload = {
         "id": "email_124",

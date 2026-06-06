@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, AsyncMock
 from schemas.email import EmailScanRequest, EmailSender, EmailHeaders
-from services.analyzer import analyze_email
+from schemas.intel import IntelResult, VTResult, VTStats, SBResult
+from services.scanner import analyze_email
 
 
 @pytest.fixture
@@ -17,21 +18,20 @@ def base_request():
 
 
 @pytest.mark.asyncio
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 async def test_analyzer_safe(mock_gather, base_request):
-    mock_gather.return_value = {"virustotal": {}, "safebrowsing": {}}
+    mock_gather.return_value = IntelResult()
     response = await analyze_email(base_request)
     assert response.score == 0
     assert response.verdict == "SAFE"
 
 
 @pytest.mark.asyncio
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 async def test_analyzer_malicious_vt(mock_gather, base_request):
-    mock_gather.return_value = {
-        "virustotal": {"http://bad.com": {"malicious": 2, "suspicious": 1}},
-        "safebrowsing": {},
-    }
+    mock_gather.return_value = IntelResult(
+        virustotal={"http://bad.com": VTResult(stats=VTStats(malicious=2, suspicious=1))}
+    )
     base_request.urls = ["http://bad.com"]
     response = await analyze_email(base_request)
     # malicious: 2 * 30 = 60
@@ -42,12 +42,11 @@ async def test_analyzer_malicious_vt(mock_gather, base_request):
 
 
 @pytest.mark.asyncio
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 async def test_analyzer_safebrowsing(mock_gather, base_request):
-    mock_gather.return_value = {
-        "virustotal": {},
-        "safebrowsing": {"matches": [{"threatType": "MALWARE"}]},
-    }
+    mock_gather.return_value = IntelResult(
+        safebrowsing=SBResult(matches=[{"threatType": "MALWARE"}])
+    )
     base_request.urls = ["http://bad.com"]
     response = await analyze_email(base_request)
     assert response.score == 50
@@ -55,12 +54,12 @@ async def test_analyzer_safebrowsing(mock_gather, base_request):
 
 
 @pytest.mark.asyncio
-@patch("services.analyzer.gather_intel", new_callable=AsyncMock)
+@patch("services.scanner.gather_intel", new_callable=AsyncMock)
 async def test_analyzer_cap_at_100(mock_gather, base_request):
-    mock_gather.return_value = {
-        "virustotal": {"http://bad.com": {"malicious": 10}},  # 300
-        "safebrowsing": {"matches": [{"threatType": "MALWARE"}]},  # 50
-    }
+    mock_gather.return_value = IntelResult(
+        virustotal={"http://bad.com": VTResult(stats=VTStats(malicious=10))},
+        safebrowsing=SBResult(matches=[{"threatType": "MALWARE"}])
+    )
     base_request.urls = ["http://bad.com"]
     base_request.subject = "Urgent password action required"  # 15
     base_request.headers.spf_status = "FAIL"  # 20

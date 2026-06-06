@@ -35,9 +35,9 @@ async def test_check_virustotal(api_keys):
         )
     )
 
-    stats = await check_virustotal(url)
+    result = await check_virustotal(url)
     assert vt_route.called
-    assert stats["malicious"] == 5
+    assert result.stats.malicious == 5
 
 
 @pytest.mark.asyncio
@@ -59,8 +59,8 @@ async def test_check_safe_browsing(api_keys):
 
     result = await check_safe_browsing(urls)
     assert sb_route.called
-    assert len(result["matches"]) == 1
-    assert result["matches"][0]["threat"]["url"] == "http://bad.com"
+    assert len(result.matches) == 1
+    assert result.matches[0]["threat"]["url"] == "http://bad.com"
 
 
 @pytest.mark.asyncio
@@ -80,6 +80,6 @@ async def test_gather_intel(api_keys):
     urls = ["http://test.com"]
     result = await gather_intel(urls)
 
-    assert "virustotal" in result
-    assert "safebrowsing" in result
-    assert result["virustotal"]["http://test.com"]["malicious"] == 1
+    assert result.virustotal
+    assert result.safebrowsing
+    assert result.virustotal["http://test.com"].stats.malicious == 1
