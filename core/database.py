@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, create_engine, Session
+from sqlmodel import SQLModel, create_engine
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,3 @@ def create_db_and_tables():
     logger.info("Creating database tables...")
     SQLModel.metadata.create_all(engine)
     logger.info("Database tables created successfully.")
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session

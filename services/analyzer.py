@@ -1,7 +1,9 @@
-from models.schemas import EmailScanRequest, EmailScanResponse
-from models.db_models import Blocklist, ScanHistory
+from schemas.email import EmailScanRequest, EmailScanResponse
+from models.db_models import ScanHistory
+from crud.crud_blocklist import get_blocklist_item_by_value
+from crud.crud_history import create_scan_history
 from services.external_intel import gather_intel
-from sqlmodel import Session, select
+from sqlmodel import Session
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,11 +17,10 @@ async def analyze_email(
 
     # 0. Check Blocklist First
     if session:
-        statement = select(Blocklist).where(
-            (Blocklist.value == request.sender.email)
-            | (Blocklist.value == request.sender.domain)
-        )
-        blocked = session.exec(statement).first()
+        blocked = get_blocklist_item_by_value(session, request.sender.email)
+        if not blocked:
+            blocked = get_blocklist_item_by_value(session, request.sender.domain)
+
         if blocked:
             final_score = 100
             verdict = "MALICIOUS"
@@ -34,8 +35,7 @@ async def analyze_email(
                 score=final_score,
                 verdict=verdict,
             )
-            session.add(history)
-            session.commit()
+            create_scan_history(session, history)
 
             return EmailScanResponse(
                 id=request.id, score=final_score, verdict=verdict, reasons=reasons
@@ -128,8 +128,7 @@ async def analyze_email(
             score=final_score,
             verdict=verdict,
         )
-        session.add(history)
-        session.commit()
+        create_scan_history(session, history)
 
     return EmailScanResponse(
         id=request.id, score=final_score, verdict=verdict, reasons=reasons

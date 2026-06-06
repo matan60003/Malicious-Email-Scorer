@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api.routes import health, scan, blocklist, history
+from api.v1.endpoints import health, scan, blocklist, history
 
 api_router = APIRouter()
 

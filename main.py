@@ -1,9 +1,8 @@
 import logging
 from fastapi import FastAPI
 from core.config import settings
-from api.router import api_router
+from api.v1.router import api_router
 from core.exceptions import global_exception_handler
-from core.database import create_db_and_tables
 import models.db_models  # noqa: F401 (Import to register models with SQLModel)
 
 # Configure basic logging
@@ -21,7 +20,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
+    pass  # Alembic will handle DB creation
 
 
 # Include API router

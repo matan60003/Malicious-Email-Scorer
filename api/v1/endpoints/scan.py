@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from core.database import get_session
-from models.schemas import EmailScanRequest, EmailScanResponse
+from api.dependencies import get_session
+from schemas.email import EmailScanRequest, EmailScanResponse
 from services.analyzer import analyze_email
 
 router = APIRouter()
