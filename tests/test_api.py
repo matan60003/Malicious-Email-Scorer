@@ -9,15 +9,14 @@ import pytest
 # Use in-memory SQLite for testing
 sqlite_url = "sqlite://"
 engine = create_engine(
-    sqlite_url, 
-    connect_args={"check_same_thread": False}, 
-    poolclass=StaticPool
+    sqlite_url, connect_args={"check_same_thread": False}, poolclass=StaticPool
 )
+
 
 @pytest.fixture(name="client")
 def client_fixture():
     SQLModel.metadata.create_all(engine)
-    
+
     def get_session_override():
         with Session(engine) as session:
             yield session
@@ -25,7 +24,7 @@ def client_fixture():
     app.dependency_overrides[get_session] = get_session_override
     with TestClient(app) as client:
         yield client
-    
+
     app.dependency_overrides.clear()
     SQLModel.metadata.drop_all(engine)
 
