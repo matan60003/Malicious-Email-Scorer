@@ -20,7 +20,7 @@ async def analyze_email(
         blocked = get_blocklist_item_by_value(session, request.sender.email)
         if not blocked:
             blocked = get_blocklist_item_by_value(session, request.sender.domain)
-        
+
         if blocked:
             final_score = 100
             verdict = "MALICIOUS"

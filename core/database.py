@@ -15,5 +15,3 @@ def create_db_and_tables():
     logger.info("Creating database tables...")
     SQLModel.metadata.create_all(engine)
     logger.info("Database tables created successfully.")
-
-
