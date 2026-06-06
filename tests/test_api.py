@@ -1,18 +1,43 @@
 from fastapi.testclient import TestClient
 from main import app
 from unittest.mock import patch, AsyncMock
+from sqlmodel import SQLModel, Session, create_engine
+from core.database import get_session
+from sqlalchemy.pool import StaticPool
+import pytest
 
-client = TestClient(app)
+# Use in-memory SQLite for testing
+sqlite_url = "sqlite://"
+engine = create_engine(
+    sqlite_url, 
+    connect_args={"check_same_thread": False}, 
+    poolclass=StaticPool
+)
+
+@pytest.fixture(name="client")
+def client_fixture():
+    SQLModel.metadata.create_all(engine)
+    
+    def get_session_override():
+        with Session(engine) as session:
+            yield session
+
+    app.dependency_overrides[get_session] = get_session_override
+    with TestClient(app) as client:
+        yield client
+    
+    app.dependency_overrides.clear()
+    SQLModel.metadata.drop_all(engine)
 
 
-def test_health_check():
+def test_health_check(client: TestClient):
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
 @patch("services.analyzer.gather_intel", new_callable=AsyncMock)
-def test_scan_email_safe(mock_gather):
+def test_scan_email_safe(mock_gather, client: TestClient):
     mock_gather.return_value = {"virustotal": {}, "safebrowsing": {}}
 
     payload = {
@@ -32,7 +57,7 @@ def test_scan_email_safe(mock_gather):
 
 
 @patch("services.analyzer.gather_intel", new_callable=AsyncMock)
-def test_scan_email_suspicious(mock_gather):
+def test_scan_email_suspicious(mock_gather, client: TestClient):
     mock_gather.return_value = {"virustotal": {}, "safebrowsing": {}}
 
     payload = {
