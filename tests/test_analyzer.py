@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, AsyncMock
-from models.schemas import EmailScanRequest, EmailSender, EmailHeaders
+from schemas.email import EmailScanRequest, EmailSender, EmailHeaders
 from services.analyzer import analyze_email
 
 

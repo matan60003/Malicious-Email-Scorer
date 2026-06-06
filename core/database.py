@@ -17,6 +17,3 @@ def create_db_and_tables():
     logger.info("Database tables created successfully.")
 
 
-def get_session():
-    with Session(engine) as session:
-        yield session
