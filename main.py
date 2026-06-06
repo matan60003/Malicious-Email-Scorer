@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from core.config import settings
 from api.router import api_router
 from core.exceptions import global_exception_handler
+from core.database import create_db_and_tables
+import models.db_models  # Import to register models with SQLModel
 
 # Configure basic logging
 logging.basicConfig(
@@ -15,6 +17,10 @@ app = FastAPI(
 
 # Exception handlers
 app.add_exception_handler(Exception, global_exception_handler)
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 # Include API router
 app.include_router(api_router)

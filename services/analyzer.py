@@ -1,13 +1,43 @@
 from models.schemas import EmailScanRequest, EmailScanResponse
+from models.db_models import Blocklist, ScanHistory
 from services.external_intel import gather_intel
+from sqlmodel import Session, select
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-async def analyze_email(request: EmailScanRequest) -> EmailScanResponse:
+async def analyze_email(request: EmailScanRequest, session: Session = None) -> EmailScanResponse:
     score = 0
     reasons = []
+
+    # 0. Check Blocklist First
+    if session:
+        statement = select(Blocklist).where(
+            (Blocklist.value == request.sender.email) | 
+            (Blocklist.value == request.sender.domain)
+        )
+        blocked = session.exec(statement).first()
+        if blocked:
+            final_score = 100
+            verdict = "MALICIOUS"
+            reasons = ["Sender is on your personal blocklist."]
+            
+            # Record history
+            history = ScanHistory(
+                message_id=request.id,
+                sender_email=request.sender.email,
+                sender_domain=request.sender.domain,
+                subject=request.subject,
+                score=final_score,
+                verdict=verdict
+            )
+            session.add(history)
+            session.commit()
+            
+            return EmailScanResponse(
+                id=request.id, score=final_score, verdict=verdict, reasons=reasons
+            )
 
     # 1. Gather Threat Intel
     intel_results = await gather_intel(request.urls)
@@ -85,6 +115,19 @@ async def analyze_email(request: EmailScanRequest) -> EmailScanResponse:
 
     if final_score == 0:
         reasons.append("No suspicious indicators found.")
+
+    # Record Scan History
+    if session:
+        history = ScanHistory(
+            message_id=request.id,
+            sender_email=request.sender.email,
+            sender_domain=request.sender.domain,
+            subject=request.subject,
+            score=final_score,
+            verdict=verdict
+        )
+        session.add(history)
+        session.commit()
 
     return EmailScanResponse(
         id=request.id, score=final_score, verdict=verdict, reasons=reasons

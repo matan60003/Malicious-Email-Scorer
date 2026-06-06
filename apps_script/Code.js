@@ -20,7 +20,7 @@ function onGmailMessageOpen(e) {
   var payload = extractEmailData(message);
   
   var result = scanWithBackend(payload);
-  return renderResultCard(result);
+  return renderResultCard(result, payload.sender.email);
 }
 
 function extractEmailData(message) {
@@ -107,7 +107,7 @@ function scanWithBackend(payload) {
   }
 }
 
-function renderResultCard(result) {
+function renderResultCard(result, senderEmail) {
   var builder = CardService.newCardBuilder();
   
   var title = "Threat Analysis";
@@ -150,6 +150,51 @@ function renderResultCard(result) {
     );
   }
   
+  if (senderEmail) {
+    var blockButton = CardService.newTextButton()
+      .setText("Block Sender")
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName("blockSenderAction")
+        .setParameters({senderEmail: senderEmail})
+      );
+    
+    section.addWidget(CardService.newButtonSet().addButton(blockButton));
+  }
+  
   builder.addSection(section);
   return builder.build();
+}
+
+function blockSenderAction(e) {
+  var senderEmail = e.parameters.senderEmail;
+  var payload = {
+    value: senderEmail,
+    type: "email"
+  };
+  
+  var options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  var blocklistUrl = BACKEND_URL.replace("/scan", "/blocklist");
+  
+  try {
+    var response = UrlFetchApp.fetch(blocklistUrl, options);
+    if (response.getResponseCode() === 200) {
+      return CardService.newActionResponseBuilder()
+        .setNotification(CardService.newNotification().setText("Sender " + senderEmail + " added to blocklist!"))
+        .build();
+    } else {
+      return CardService.newActionResponseBuilder()
+        .setNotification(CardService.newNotification().setText("Failed to block: " + response.getContentText()))
+        .build();
+    }
+  } catch (err) {
+    return CardService.newActionResponseBuilder()
+      .setNotification(CardService.newNotification().setText("Error: " + err.message))
+      .build();
+  }
 }
