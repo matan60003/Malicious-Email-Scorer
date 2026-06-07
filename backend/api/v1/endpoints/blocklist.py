@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from api.dependencies import get_session
-from models.db_models import Blocklist
+from orm.db_models import Blocklist
 from repositories.blocklist import (
     get_blocklist,
     get_blocklist_item_by_value,

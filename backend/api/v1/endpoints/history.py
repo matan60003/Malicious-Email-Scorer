@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from api.dependencies import get_session
-from models.db_models import ScanHistory
+from orm.db_models import ScanHistory
 from repositories.history import get_scan_history
 from typing import List
 

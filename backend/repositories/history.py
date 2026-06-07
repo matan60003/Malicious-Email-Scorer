@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from models.db_models import ScanHistory
+from orm.db_models import ScanHistory
 from typing import List
 
 
