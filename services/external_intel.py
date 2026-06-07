@@ -1,12 +1,12 @@
 import asyncio
 import base64
 from typing import List
-import logging
+import structlog
 from core.config import settings
 from core.http_client import get_client
 from schemas.intel import IntelResult, VTResult, VTStats, SBResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Limit concurrent requests to VirusTotal to avoid rate limits
 vt_semaphore = asyncio.Semaphore(5)

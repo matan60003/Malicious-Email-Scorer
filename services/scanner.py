@@ -11,9 +11,9 @@ from services.rules import (
     LinkDensityRule,
 )
 from sqlmodel import Session
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Register all active rules in the engine
 ACTIVE_RULES = [
