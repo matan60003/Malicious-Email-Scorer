@@ -45,23 +45,20 @@ Follow these steps to run the backend API locally.
 
 2. **Install dependencies:**
    ```bash
+   cd backend
    poetry install
    ```
 
 3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory (or export them):
+   Create a `.env` file in the `backend/` directory (or export them):
    ```ini
    VIRUSTOTAL_API_KEY="your_vt_key_here"
    SAFE_BROWSING_API_KEY="your_sb_key_here"
+   API_KEY_SECRET="super_secret_dev_key"
    ```
 
-4. **Initialize the Database:**
-   Run the Alembic migrations to create the local SQLite database (`data.db`) and apply the initial schema.
-   ```bash
-   poetry run alembic upgrade head
-   ```
-
-5. **Start the FastAPI Server:**
+4. **Start the FastAPI Server:**
+   *(Note: The SQLite database and tables will be automatically created on startup.)*
    ```bash
    poetry run uvicorn main:app --reload
    ```
@@ -75,13 +72,14 @@ To run the frontend UI directly inside your Gmail inbox, you must deploy the Goo
    * Go to [script.google.com](https://script.google.com/) and click **New project**.
    * Name the project `Malicious Email Scorer`.
 2. **Copy the Source Code:**
-   * Open the `apps_script/Code.js` file from this repository and copy its contents into the `Code.gs` file in the Apps Script editor.
+   * Open the `frontend/Code.js` file from this repository and copy its contents into the `Code.gs` file in the Apps Script editor.
 3. **Configure the Manifest:**
    * In the Apps Script editor, click on **Project Settings** (the gear icon) and check **"Show 'appsscript.json' manifest file in editor"**.
-   * Navigate back to the editor, open `appsscript.json`, and paste the contents of the `apps_script/appsscript.json` file from this repository over it.
-4. **Link the Backend URL:**
+   * Navigate back to the editor, open `appsscript.json`, and paste the contents of the `frontend/appsscript.json` file from this repository over it.
+4. **Link the Backend URL & API Key:**
    * If you are running the backend locally on `localhost:8000`, you will need to expose it to the internet using a tool like [ngrok](https://ngrok.com/) (`ngrok http 8000`).
    * Update the `API_URL` variable at the very top of `Code.gs` to point to your public ngrok URL (e.g., `https://<your-ngrok-id>.ngrok-free.app/api/v1/scan`).
+   * Update the `BACKEND_API_KEY` variable at the top of `Code.gs` to match the `API_KEY_SECRET` you defined in your backend `.env` file.
 5. **Test the Add-on:**
    * Click **Deploy** -> **Test deployments**.
    * Ensure the application type is **Google Workspace Add-on**, then click **Install**.
