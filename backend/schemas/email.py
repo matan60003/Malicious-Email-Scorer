@@ -8,7 +8,7 @@ class EmailSender(BaseModel):
     domain: str
 
 
-class EmailHeaders(BaseModel):
+class EmailAuthentication(BaseModel):
     spf_status: Optional[str] = Field(None, description="SPF verification status")
     dkim_status: Optional[str] = Field(None, description="DKIM verification status")
     dmarc_status: Optional[str] = Field(None, description="DMARC verification status")
@@ -20,7 +20,7 @@ class EmailScanRequest(BaseModel):
     subject: str
     body_text: str
     urls: List[HttpUrl] = Field(default_factory=list)
-    headers: EmailHeaders
+    authentication: EmailAuthentication
 
 
 class EmailScanResponse(BaseModel):

@@ -46,7 +46,7 @@ def test_scan_email_safe(mock_gather, client: TestClient):
         "subject": "Hello there",
         "body_text": "Just saying hi.",
         "urls": [],
-        "headers": {"spf_status": "PASS", "dkim_status": "PASS"},
+        "authentication": {"spf_status": "PASS", "dkim_status": "PASS"},
     }
     response = client.post(
         "/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"}
@@ -68,7 +68,7 @@ def test_scan_email_suspicious(mock_gather, client: TestClient):
         "subject": "URGENT password reset",
         "body_text": "Click here.",
         "urls": ["http://bad.com/reset"],
-        "headers": {"spf_status": "FAIL", "dkim_status": "PASS"},
+        "authentication": {"spf_status": "FAIL", "dkim_status": "PASS"},
     }
     response = client.post(
         "/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"}

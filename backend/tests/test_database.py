@@ -64,7 +64,7 @@ def test_scan_with_blocklist(client: TestClient, session: Session):
         "subject": "Hello",
         "body_text": "This is a test.",
         "urls": [],
-        "headers": {"spf_status": "PASS", "dkim_status": "PASS"},
+        "authentication": {"spf_status": "PASS", "dkim_status": "PASS"},
     }
 
     response = client.post(

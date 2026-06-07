@@ -73,7 +73,7 @@ function extractEmailData(message) {
     subject: subject,
     body_text: bodyText.substring(0, 5000), // truncate for safety
     urls: urls,
-    headers: {
+    authentication: {
       spf_status: spfStatus,
       dkim_status: dkimStatus
     }
