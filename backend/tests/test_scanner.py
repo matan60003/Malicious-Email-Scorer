@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, AsyncMock
-from schemas.email import EmailScanRequest, EmailSender, EmailHeaders
+from schemas.email import EmailScanRequest, EmailSender, EmailAuthentication
 from schemas.intel import IntelResult, VTResult, VTStats, SBResult
 from services.scanner import analyze_email
 
@@ -13,7 +13,7 @@ def base_request():
         subject="Normal subject",
         body_text="Normal body",
         urls=[],
-        headers=EmailHeaders(spf_status="PASS", dkim_status="PASS"),
+        authentication=EmailAuthentication(spf_status="PASS", dkim_status="PASS"),
     )
 
 
@@ -64,7 +64,7 @@ async def test_analyzer_unbounded_score(mock_gather, base_request):
     )
     base_request.urls = ["http://bad.com"]
     base_request.subject = "Urgent password action required"  # 15
-    base_request.headers.spf_status = "FAIL"  # 20
+    base_request.authentication.spf_status = "FAIL"  # 20
 
     response = await analyze_email(base_request)
     assert response.score == 385

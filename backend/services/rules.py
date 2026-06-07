@@ -61,16 +61,16 @@ class AuthenticationRule(ScoringRule):
     ) -> Tuple[int, Optional[str]]:
         score = 0
         reasons = []
-        if request.headers.spf_status != "PASS":
+        if request.authentication.spf_status != "PASS":
             score += 20
             reasons.append(
-                f"SPF check failed or missing (Status: {request.headers.spf_status})."
+                f"SPF check failed or missing (Status: {request.authentication.spf_status})."
             )
 
-        if request.headers.dkim_status != "PASS":
+        if request.authentication.dkim_status != "PASS":
             score += 20
             reasons.append(
-                f"DKIM check failed or missing (Status: {request.headers.dkim_status})."
+                f"DKIM check failed or missing (Status: {request.authentication.dkim_status})."
             )
 
         return score, " | ".join(reasons) if reasons else None

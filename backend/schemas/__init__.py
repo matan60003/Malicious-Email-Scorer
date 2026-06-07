@@ -1,3 +1,3 @@
-from schemas.email import EmailSender, EmailHeaders, EmailScanRequest, EmailScanResponse
+from schemas.email import EmailSender, EmailAuthentication, EmailScanRequest, EmailScanResponse
 
-__all__ = ["EmailSender", "EmailHeaders", "EmailScanRequest", "EmailScanResponse"]
+__all__ = ["EmailSender", "EmailAuthentication", "EmailScanRequest", "EmailScanResponse"]
