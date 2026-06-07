@@ -26,7 +26,7 @@ class EmailScanRequest(BaseModel):
 class EmailScanResponse(BaseModel):
     id: str
     score: int = Field(
-        ..., ge=0, le=100, description="Maliciousness score from 0 to 100"
+        ..., description="Unbounded maliciousness score. -1 indicates an error."
     )
     verdict: str = Field(..., description="E.g., SAFE, SUSPICIOUS, MALICIOUS")
     reasons: List[str] = Field(
