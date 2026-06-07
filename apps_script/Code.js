@@ -1,5 +1,6 @@
 // NOTE: Change this URL to your ngrok or production backend URL during deployment.
 const BACKEND_URL = "https://slaw-jolliness-neurotic.ngrok-free.dev/api/v1/scan";
+const BACKEND_API_KEY = "super_secret_dev_key";
 
 function onHomepage(e) {
   return CardService.newCardBuilder()
@@ -83,6 +84,9 @@ function scanWithBackend(payload) {
   var options = {
     method: "post",
     contentType: "application/json",
+    headers: {
+      "x-api-key": BACKEND_API_KEY
+    },
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   };
@@ -175,6 +179,9 @@ function blockSenderAction(e) {
   var options = {
     method: "post",
     contentType: "application/json",
+    headers: {
+      "x-api-key": BACKEND_API_KEY
+    },
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   };
