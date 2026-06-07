@@ -138,7 +138,7 @@ function renderResultCard(result, senderEmail) {
   if (result.score >= 0) {
     section.addWidget(
       CardService.newDecoratedText()
-        .setTopLabel("Risk Score (0-100)")
+        .setTopLabel("Total Risk Score")
         .setText("<font color='" + color + "'><b>" + result.score + "</b></font>")
     );
   }

@@ -73,5 +73,5 @@ def test_scan_with_blocklist(client: TestClient, session: Session):
     assert response.status_code == 200
     data = response.json()
     assert data["verdict"] == "MALICIOUS"
-    assert data["score"] == 100
+    assert data["score"] == 999
     assert "Sender is on your personal blocklist." in data["reasons"]

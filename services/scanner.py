@@ -39,7 +39,7 @@ async def analyze_email(
                 blocked = get_blocklist_item_by_value(session, request.sender.domain)
 
             if blocked:
-                final_score = 100
+                final_score = 999
                 verdict = "MALICIOUS"
                 reasons = ["Sender is on your personal blocklist."]
 
@@ -61,11 +61,11 @@ async def analyze_email(
                 reasons.append(rule_reason)
 
         # 4. Thresholds & Explanations
-        final_score = min(score, 100)
+        final_score = score
 
-        if final_score >= 70:
+        if final_score >= 100:
             verdict = "MALICIOUS"
-        elif final_score >= 30:
+        elif final_score >= 50:
             verdict = "SUSPICIOUS"
         else:
             verdict = "SAFE"

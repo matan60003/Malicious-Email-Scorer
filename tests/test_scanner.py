@@ -38,9 +38,9 @@ async def test_analyzer_malicious_vt(mock_gather, base_request):
     response = await analyze_email(base_request)
     # malicious: 2 * 30 = 60
     # suspicious: 1 * 10 = 10
-    # total = 70 -> MALICIOUS
+    # total = 70 -> SUSPICIOUS (new threshold is 100 for malicious)
     assert response.score == 70
-    assert response.verdict == "MALICIOUS"
+    assert response.verdict == "SUSPICIOUS"
 
 
 @pytest.mark.asyncio
@@ -57,7 +57,7 @@ async def test_analyzer_safebrowsing(mock_gather, base_request):
 
 @pytest.mark.asyncio
 @patch("services.scanner.gather_intel", new_callable=AsyncMock)
-async def test_analyzer_cap_at_100(mock_gather, base_request):
+async def test_analyzer_unbounded_score(mock_gather, base_request):
     mock_gather.return_value = IntelResult(
         virustotal={"http://bad.com": VTResult(stats=VTStats(malicious=10))},
         safebrowsing=SBResult(matches=[{"threatType": "MALWARE"}]),
@@ -67,5 +67,5 @@ async def test_analyzer_cap_at_100(mock_gather, base_request):
     base_request.headers.spf_status = "FAIL"  # 20
 
     response = await analyze_email(base_request)
-    assert response.score == 100
+    assert response.score == 385
     assert response.verdict == "MALICIOUS"
