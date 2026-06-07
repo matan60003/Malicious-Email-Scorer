@@ -1,7 +1,7 @@
 from schemas.email import EmailScanRequest, EmailScanResponse
 from models.db_models import ScanHistory
-from crud.crud_blocklist import get_blocklist_item_by_value
-from crud.crud_history import create_scan_history
+from repositories.blocklist import get_blocklist_item_by_value
+from repositories.history import create_scan_history
 from services.external_intel import gather_intel
 from services.rules import (
     VirusTotalRule,
