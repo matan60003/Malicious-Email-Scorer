@@ -4,6 +4,7 @@ from api.v1.router import api_router
 from core.exceptions import global_exception_handler
 from core.http_client import start_client, stop_client
 from contextlib import asynccontextmanager
+from core.database import create_db_and_tables
 import orm.db_models  # noqa: F401 (Import to register models with SQLModel)
 
 import uuid
@@ -17,6 +18,7 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    create_db_and_tables()
     # Start global HTTP client
     await start_client()
     yield
