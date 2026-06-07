@@ -28,56 +28,65 @@ ACTIVE_RULES = [
 async def analyze_email(
     request: EmailScanRequest, session: Session = None
 ) -> EmailScanResponse:
-    score = 0
-    reasons = []
+    try:
+        score = 0
+        reasons = []
 
-    # 1. Check Blocklist First
-    if session:
-        blocked = get_blocklist_item_by_value(session, request.sender.email)
-        if not blocked:
-            blocked = get_blocklist_item_by_value(session, request.sender.domain)
+        # 1. Check Blocklist First
+        if session:
+            blocked = get_blocklist_item_by_value(session, request.sender.email)
+            if not blocked:
+                blocked = get_blocklist_item_by_value(session, request.sender.domain)
 
-        if blocked:
-            final_score = 100
+            if blocked:
+                final_score = 100
+                verdict = "MALICIOUS"
+                reasons = ["Sender is on your personal blocklist."]
+
+                # Record history
+                _record_scan_history(session, request, final_score, verdict)
+                return EmailScanResponse(
+                    id=request.id, score=final_score, verdict=verdict, reasons=reasons
+                )
+
+        # 2. Gather Threat Intel
+        intel_results = await gather_intel(request.urls)
+
+        # 3. Rule Evaluation & Weighted Scoring
+        for rule in ACTIVE_RULES:
+            rule_score, rule_reason = rule.evaluate(request, intel_results)
+            if rule_score > 0:
+                score += rule_score
+            if rule_reason:
+                reasons.append(rule_reason)
+
+        # 4. Thresholds & Explanations
+        final_score = min(score, 100)
+
+        if final_score >= 70:
             verdict = "MALICIOUS"
-            reasons = ["Sender is on your personal blocklist."]
+        elif final_score >= 30:
+            verdict = "SUSPICIOUS"
+        else:
+            verdict = "SAFE"
 
-            # Record history
-            _record_scan_history(session, request, final_score, verdict)
-            return EmailScanResponse(
-                id=request.id, score=final_score, verdict=verdict, reasons=reasons
-            )
+        if final_score == 0:
+            reasons.append("No suspicious indicators found.")
 
-    # 2. Gather Threat Intel
-    intel_results = await gather_intel(request.urls)
+        # Record Scan History
+        _record_scan_history(session, request, final_score, verdict)
 
-    # 3. Rule Evaluation & Weighted Scoring
-    for rule in ACTIVE_RULES:
-        rule_score, rule_reason = rule.evaluate(request, intel_results)
-        if rule_score > 0:
-            score += rule_score
-        if rule_reason:
-            reasons.append(rule_reason)
-
-    # 4. Thresholds & Explanations
-    final_score = min(score, 100)
-
-    if final_score >= 70:
-        verdict = "MALICIOUS"
-    elif final_score >= 30:
-        verdict = "SUSPICIOUS"
-    else:
-        verdict = "SAFE"
-
-    if final_score == 0:
-        reasons.append("No suspicious indicators found.")
-
-    # Record Scan History
-    _record_scan_history(session, request, final_score, verdict)
-
-    return EmailScanResponse(
-        id=request.id, score=final_score, verdict=verdict, reasons=reasons
-    )
+        return EmailScanResponse(
+            id=request.id, score=final_score, verdict=verdict, reasons=reasons
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error in analyze_email: {e}", exc_info=True)
+        return EmailScanResponse(
+            id=request.id,
+            score=-1,
+            verdict="ERROR",
+            reasons=[f"Internal Server Error: {str(e)}"],
+        )
 
 
 def _record_scan_history(
