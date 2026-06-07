@@ -11,6 +11,9 @@ on:
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - name: Checkout Code
