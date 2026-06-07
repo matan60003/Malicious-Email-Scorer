@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from models.db_models import Blocklist
+from orm.db_models import Blocklist
 from typing import List, Optional
 
 

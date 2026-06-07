@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 from sqlmodel import SQLModel
-import models.db_models  # noqa: F401
+import orm.db_models  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
