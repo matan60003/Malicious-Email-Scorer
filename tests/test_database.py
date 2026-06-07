@@ -42,7 +42,9 @@ def client_fixture(session: Session):
 
 def test_add_to_blocklist(client: TestClient):
     response = client.post(
-        "/api/v1/blocklist/", json={"value": "test@evil.com", "type": "email"}, headers={"x-api-key": "super_secret_dev_key"}
+        "/api/v1/blocklist/",
+        json={"value": "test@evil.com", "type": "email"},
+        headers={"x-api-key": "super_secret_dev_key"},
     )
     assert response.status_code == 200
     data = response.json()
@@ -65,7 +67,9 @@ def test_scan_with_blocklist(client: TestClient, session: Session):
         "headers": {"spf_status": "PASS", "dkim_status": "PASS"},
     }
 
-    response = client.post("/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"})
+    response = client.post(
+        "/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["verdict"] == "MALICIOUS"

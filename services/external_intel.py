@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 # Limit concurrent requests to VirusTotal to avoid rate limits
 vt_semaphore = asyncio.Semaphore(5)
 
+
 async def check_virustotal(url: str) -> VTResult:
     if not settings.VIRUSTOTAL_API_KEY:
         logger.warning(

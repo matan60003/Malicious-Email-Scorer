@@ -6,20 +6,17 @@ api_router = APIRouter()
 
 api_router.include_router(health.router, tags=["health"])
 api_router.include_router(
-    scan.router, 
-    prefix="/api/v1", 
-    tags=["scan"], 
-    dependencies=[Depends(verify_api_key)]
+    scan.router, prefix="/api/v1", tags=["scan"], dependencies=[Depends(verify_api_key)]
 )
 api_router.include_router(
-    blocklist.router, 
-    prefix="/api/v1/blocklist", 
+    blocklist.router,
+    prefix="/api/v1/blocklist",
     tags=["blocklist"],
-    dependencies=[Depends(verify_api_key)]
+    dependencies=[Depends(verify_api_key)],
 )
 api_router.include_router(
-    history.router, 
-    prefix="/api/v1/history", 
+    history.router,
+    prefix="/api/v1/history",
     tags=["history"],
-    dependencies=[Depends(verify_api_key)]
+    dependencies=[Depends(verify_api_key)],
 )

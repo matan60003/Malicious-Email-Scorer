@@ -12,6 +12,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Start global HTTP client
@@ -20,10 +21,11 @@ async def lifespan(app: FastAPI):
     # Stop global HTTP client
     await stop_client()
 
+
 app = FastAPI(
-    title=settings.PROJECT_NAME, 
+    title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Exception handlers

@@ -30,7 +30,9 @@ async def test_analyzer_safe(mock_gather, base_request):
 @patch("services.scanner.gather_intel", new_callable=AsyncMock)
 async def test_analyzer_malicious_vt(mock_gather, base_request):
     mock_gather.return_value = IntelResult(
-        virustotal={"http://bad.com": VTResult(stats=VTStats(malicious=2, suspicious=1))}
+        virustotal={
+            "http://bad.com": VTResult(stats=VTStats(malicious=2, suspicious=1))
+        }
     )
     base_request.urls = ["http://bad.com"]
     response = await analyze_email(base_request)
@@ -58,7 +60,7 @@ async def test_analyzer_safebrowsing(mock_gather, base_request):
 async def test_analyzer_cap_at_100(mock_gather, base_request):
     mock_gather.return_value = IntelResult(
         virustotal={"http://bad.com": VTResult(stats=VTStats(malicious=10))},
-        safebrowsing=SBResult(matches=[{"threatType": "MALWARE"}])
+        safebrowsing=SBResult(matches=[{"threatType": "MALWARE"}]),
     )
     base_request.urls = ["http://bad.com"]
     base_request.subject = "Urgent password action required"  # 15

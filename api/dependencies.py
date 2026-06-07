@@ -6,6 +6,7 @@ from core.config import settings
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=True)
 
+
 def verify_api_key(api_key: str = Security(api_key_header)):
     if api_key != settings.API_KEY_SECRET:
         raise HTTPException(
@@ -13,6 +14,7 @@ def verify_api_key(api_key: str = Security(api_key_header)):
             detail="Invalid API Key",
         )
     return api_key
+
 
 def get_session():
     with Session(engine) as session:

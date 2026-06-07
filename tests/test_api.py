@@ -48,7 +48,9 @@ def test_scan_email_safe(mock_gather, client: TestClient):
         "urls": [],
         "headers": {"spf_status": "PASS", "dkim_status": "PASS"},
     }
-    response = client.post("/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"})
+    response = client.post(
+        "/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == "email_123"
@@ -68,7 +70,9 @@ def test_scan_email_suspicious(mock_gather, client: TestClient):
         "urls": ["http://bad.com/reset"],
         "headers": {"spf_status": "FAIL", "dkim_status": "PASS"},
     }
-    response = client.post("/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"})
+    response = client.post(
+        "/api/v1/scan", json=payload, headers={"x-api-key": "super_secret_dev_key"}
+    )
     assert response.status_code == 200
     data = response.json()
     # Score should be:
