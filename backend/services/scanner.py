@@ -50,7 +50,7 @@ async def analyze_email(
                 )
 
         # 2. Gather Threat Intel
-        intel_results = await gather_intel(request.urls)
+        intel_results = await gather_intel([str(u) for u in request.urls])
 
         # 3. Rule Evaluation & Weighted Scoring
         for rule in ACTIVE_RULES:

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, HttpUrl
 from typing import List, Optional
 
 
@@ -19,7 +19,7 @@ class EmailScanRequest(BaseModel):
     sender: EmailSender
     subject: str
     body_text: str
-    urls: List[str] = Field(default_factory=list)
+    urls: List[HttpUrl] = Field(default_factory=list)
     headers: EmailHeaders
 
 
