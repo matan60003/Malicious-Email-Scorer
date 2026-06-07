@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel, Field
-from typing import Optional
+from sqlmodel import SQLModel, Field, Column, JSON
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -20,4 +20,5 @@ class ScanHistory(SQLModel, table=True):
     subject: str
     score: int
     verdict: str
+    reasons: List[str] = Field(default_factory=list, sa_column=Column(JSON))
     scanned_at: datetime = Field(default_factory=datetime.utcnow)

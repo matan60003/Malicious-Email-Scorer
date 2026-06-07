@@ -44,7 +44,7 @@ async def analyze_email(
                 reasons = ["Sender is on your personal blocklist."]
 
                 # Record history
-                _record_scan_history(session, request, final_score, verdict)
+                _record_scan_history(session, request, final_score, verdict, reasons)
                 return EmailScanResponse(
                     id=request.id, score=final_score, verdict=verdict, reasons=reasons
                 )
@@ -74,7 +74,7 @@ async def analyze_email(
             reasons.append("No suspicious indicators found.")
 
         # Record Scan History
-        _record_scan_history(session, request, final_score, verdict)
+        _record_scan_history(session, request, final_score, verdict, reasons)
 
         return EmailScanResponse(
             id=request.id, score=final_score, verdict=verdict, reasons=reasons
@@ -90,7 +90,11 @@ async def analyze_email(
 
 
 def _record_scan_history(
-    session: Session, request: EmailScanRequest, final_score: int, verdict: str
+    session: Session,
+    request: EmailScanRequest,
+    final_score: int,
+    verdict: str,
+    reasons: list[str],
 ):
     if session:
         history = ScanHistory(
@@ -100,5 +104,6 @@ def _record_scan_history(
             subject=request.subject,
             score=final_score,
             verdict=verdict,
+            reasons=reasons,
         )
         create_scan_history(session, history)
