@@ -7,10 +7,13 @@ from core.http_client import start_client, stop_client
 from contextlib import asynccontextmanager
 import models.db_models  # noqa: F401 (Import to register models with SQLModel)
 
-# Configure basic logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+import uuid
+import structlog
+from fastapi import Request
+from core.logging import setup_logging
+
+# Configure structured JSON logging
+setup_logging()
 
 
 @asynccontextmanager
@@ -27,6 +30,33 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan,
 )
+
+
+@app.middleware("http")
+async def structured_logging_middleware(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    # Clear contextvars for the new request
+    structlog.contextvars.clear_contextvars()
+    # Bind request context so every log line contains these fields
+    structlog.contextvars.bind_contextvars(
+        request_id=request_id,
+        method=request.method,
+        path=request.url.path,
+    )
+
+    logger = structlog.get_logger(__name__)
+    logger.info("Request started")
+
+    try:
+        response = await call_next(request)
+        structlog.contextvars.bind_contextvars(status_code=response.status_code)
+        logger.info("Request finished")
+        return response
+    except Exception as e:
+        structlog.contextvars.bind_contextvars(status_code=500)
+        logger.exception("Request failed")
+        raise e
+
 
 # Exception handlers
 app.add_exception_handler(Exception, global_exception_handler)

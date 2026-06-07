@@ -1,8 +1,8 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 async def global_exception_handler(request: Request, exc: Exception):
