@@ -8,7 +8,7 @@ from services.rules import (
     SafeBrowsingRule,
     AuthenticationRule,
     KeywordRule,
-    LinkDensityRule
+    LinkDensityRule,
 )
 from sqlmodel import Session
 import logging
@@ -21,8 +21,9 @@ ACTIVE_RULES = [
     SafeBrowsingRule(),
     AuthenticationRule(),
     KeywordRule(),
-    LinkDensityRule()
+    LinkDensityRule(),
 ]
+
 
 async def analyze_email(
     request: EmailScanRequest, session: Session = None
@@ -40,7 +41,7 @@ async def analyze_email(
             final_score = 100
             verdict = "MALICIOUS"
             reasons = ["Sender is on your personal blocklist."]
-            
+
             # Record history
             _record_scan_history(session, request, final_score, verdict)
             return EmailScanResponse(
@@ -78,7 +79,10 @@ async def analyze_email(
         id=request.id, score=final_score, verdict=verdict, reasons=reasons
     )
 
-def _record_scan_history(session: Session, request: EmailScanRequest, final_score: int, verdict: str):
+
+def _record_scan_history(
+    session: Session, request: EmailScanRequest, final_score: int, verdict: str
+):
     if session:
         history = ScanHistory(
             message_id=request.id,

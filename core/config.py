@@ -7,6 +7,7 @@ class Settings(BaseSettings):
 
     VIRUSTOTAL_API_KEY: str | None = None
     SAFE_BROWSING_API_KEY: str | None = None
+    API_KEY_SECRET: str = "super_secret_dev_key"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
