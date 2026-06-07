@@ -1,4 +1,3 @@
-import logging
 from fastapi import FastAPI
 from core.config import settings
 from api.v1.router import api_router
