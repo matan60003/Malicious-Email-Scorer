@@ -22,7 +22,7 @@ The backend orchestrates multiple asynchronous outbound requests to external thr
 ## 3. Implemented Features
 
 * **Contextual Extraction:** Automatically extracts email headers, sender domains, and embedded URLs from the currently viewed email without requiring user input.
-* **Heuristic Scoring Engine:** A transparent, deterministic scoring algorithm (0-100) that evaluates threat intel data, domain spoofing metrics (SPF/DKIM failures), and content-based keywords.
+* **Heuristic Scoring Engine:** A transparent, deterministic scoring algorithm (unbounded) that evaluates threat intel data, domain spoofing metrics (SPF/DKIM failures), and content-based keywords.
 * **Explainable Verdicts:** Provides human-readable reasons (e.g., "URL flagged by VirusTotal", "SPF Check Failed") alongside the final verdict so users understand *why* an email was flagged.
 * **Personal Blocklist:** Users can proactively block specific email addresses or entire domains. Blocked senders bypass heuristics and are immediately flagged as MALICIOUS.
 * **Scan History Audit Log:** Every processed email is recorded in the database, allowing for incident response tracking and future machine learning dataset generation.
