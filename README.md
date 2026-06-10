@@ -90,4 +90,3 @@ To run the frontend UI directly inside your Gmail inbox, you must deploy the Goo
 * **Heuristic Reliance:** The scoring engine currently relies on static heuristic weights. Sophisticated zero-day phishing attacks that do not trigger VirusTotal, Safe Browsing, or keyword rules may evade detection.
 * **No Attachment Scanning:** The project currently extracts and scans URLs and body text, but does not download, hash, or sandbox file attachments.
 * **Single-Tenant Database:** The project utilizes a local SQLite database, which is excellent for a single-user deployment but lacks the concurrent write capabilities required for a massive multi-tenant SaaS deployment.
-* **Synchronous Client Flow:** The Apps Script UI waits synchronously for the backend to finish processing. If the threat intel APIs experience severe latency, the UI widget may timeout before the verdict is returned.
